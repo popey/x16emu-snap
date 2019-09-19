@@ -1,0 +1,107 @@
+name: x16emu
+base: core18 # the base snap is the execution environment for this snap
+adopt-info: x16-emulator
+summary: Commander X16 Emulator
+description: |
+  This is an emulator for the Commander X16 computer system. 
+
+grade: stable
+confinement: strict
+
+parts:
+  cc65:
+    source: https://github.com/cc65/cc65.git
+    source-tag: "V2.18"
+    plugin: make
+    override-build: |
+      make bin USER_CFLAGS=-Werror PREFIX=$SNAPCRAFT_PART_INSTALL
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      install bin/* $SNAPCRAFT_PART_INSTALL/bin/
+  x16-roms:
+    after: [cc65]
+    plugin: make
+    source: https://github.com/commanderx16/x16-rom.git
+    override-pull: |
+      snapcraftctl pull
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      echo $last_committed_tag
+      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "beta:" { print $2 }')"
+      echo $last_released_tag
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+      fi
+    override-build: |
+      make
+      install rom.bin $SNAPCRAFT_PART_INSTALL/
+  x16-emulator:
+    after: [x16-roms]
+    plugin: make
+    source: https://github.com/commanderx16/x16-emulator.git
+    build-packages:
+      - libsdl2-dev
+      - git
+    override-pull: |
+      snapcraftctl pull
+      last_committed_tag="$(git describe --tags --abbrev=0)"
+      echo $last_committed_tag
+      last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "beta:" { print $2 }')"
+      echo $last_released_tag
+      # If the latest tag from the upstream project has not been released to
+      # beta, build that tag instead of master.
+      if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
+        git fetch
+        git checkout "${last_committed_tag}"
+        echo "Setting version to $last_committed_tag"
+        snapcraftctl set-version "${last_committed_tag}"
+      else
+        echo "Setting version to $(git rev-parse --short HEAD)"
+        snapcraftctl set-version "$(git rev-parse --short HEAD)"
+      fi
+    override-build: |
+      make
+      cp x16emu $SNAPCRAFT_PART_INSTALL
+    stage-packages:
+      - libasound2
+      - libasyncns0
+      - libflac8
+      - libogg0
+      - libpulse0
+      - libsdl2-2.0-0
+      - libsndfile1
+      - libsndio6.1
+      - libvorbis0a
+      - libvorbisenc2
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libx11-6
+      - libxau6
+      - libxcb1
+      - libxcursor1
+      - libxdmcp6
+      - libxext6
+      - libxfixes3
+      - libxi6
+      - libxinerama1
+      - libxkbcommon0
+      - libxrandr2
+      - libxrender1
+      - libxss1
+      - libxxf86vm1
+
+apps:
+  x16emu:
+    command: x16emu -rom $SNAP/rom.bin
+    environment:
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$LD_LIBRARY_PATH"
+    plugs:
+      - x11
+      - opengl
+      - pulseaudio
+      - network
+      - network-bind
+      - home
+      - removable-media
