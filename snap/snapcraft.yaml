@@ -98,6 +98,7 @@ apps:
     environment:
       LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$LD_LIBRARY_PATH"
     plugs:
+      - joystick
       - x11
       - opengl
       - pulseaudio
@@ -105,3 +106,4 @@ apps:
       - network-bind
       - home
       - removable-media
+      - wayland
