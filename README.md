@@ -13,6 +13,6 @@ They're pushed to the edge channel in the store.
 
 Install on any [supported Linux](https://snapcraft.io/docs/installing-snapd) distribution easily via:-
 
-   snap install x16emu
+`snap install x16emu`
 
 
