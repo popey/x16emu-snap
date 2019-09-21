@@ -1,8 +1,7 @@
 [Desktop Entry]
-Name=Commander X16
-GenericName=Emulator
-Comment=Emulator for the Commander X16 8-bit computer
-Exec=x16emu
+Name=X16 Documentation
+Comment=Documentation Commander X16 8-bit computer
+Exec=x16emu.programmer-docs
 Icon=${SNAP}/meta/gui/x16emu.png
 Type=Application
 Categories=Game;Emulator;

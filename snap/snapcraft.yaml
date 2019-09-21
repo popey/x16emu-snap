@@ -9,6 +9,46 @@ grade: stable
 confinement: strict
 
 parts:
+  pandoc: # The version of pandoc in Ubuntu 18.04 is too old to build the x16-docs, so we update it
+    source: https://github.com/jgm/pandoc.git
+    source-tag: "2.7.3"
+    plugin: make
+    build-packages: 
+      - ghc
+      - haskell-stack 
+    override-pull: |
+      set -x
+      stack update
+      stack upgrade
+      snapcraftctl pull
+    override-build: |
+      PATH=$HOME/.local/bin:$PATH
+      which stack
+      ls -l
+      cat stack.yaml
+      sed -i 's|"$locals"|locals|g' stack.yaml
+      stack setup
+      stack install
+  docs-launcher:
+    plugin: dump
+    source: snap/local
+  x16-docs: # Generate PDFs of the markdown docs
+    after: [pandoc]
+    source: https://github.com/commanderx16/x16-docs.git
+    plugin: nil
+    override-pull: |
+      snapcraftctl pull
+      # wget https://raw.githubusercontent.com/commanderx16/x16-emulator/master/github-pandoc.css
+      # cp github-pandoc.css $SNAPCRAFT_PART_INSTALL
+      # pandoc --from markdown_github --to html -c github-pandoc.css --standalone --metadata pagetitle="Commander X16 Programmer's Reference Guide" Commander\ X16\ Programmer\'s\ Reference\ Guide.md --output $SNAPCRAFT_PART_INSTALL/Programmer\'s\ Reference\ Guide.html
+      pandoc --from markdown_github -t latex -c github-pandoc.css --standalone --metadata pagetitle="Commander X16 Programmer's Reference Guide" Commander\ X16\ Programmer\'s\ Reference\ Guide.md --output $SNAPCRAFT_PART_INSTALL/Programmer\'s\ Reference\ Guide.pdf
+      # pandoc --from markdown_github --to html -c github-pandoc.css --standalone --metadata pagetitle="VERA Programmer's Reference.md" VERA\ Programmer\'s\ Reference.md --output $SNAPCRAFT_PART_INSTALL/VERA\ Programmer\'s\ Reference.html
+      pandoc --from markdown_github -t latex -c github-pandoc.css --standalone --metadata pagetitle="VERA Programmer's Reference.md" VERA\ Programmer\'s\ Reference.md --output $SNAPCRAFT_PART_INSTALL/VERA\ Programmer\'s\ Reference.pdf
+    build-packages:
+      # - wget
+      - texlive-latex-base
+      - texlive-latex-extra 
+      - texlive-fonts-recommended
   cc65:
     source: https://github.com/cc65/cc65.git
     source-tag: "V2.18"
@@ -107,3 +147,11 @@ apps:
       - home
       - removable-media
       - wayland
+  programmer-docs:
+    command: docs $SNAP/Programmer\'s\ Reference\ Guide.pdf
+    plugs:
+      - desktop
+  vera-docs:
+    command: docs $SNAP/VERA\ Programmer\'s\ Reference.pdf
+    plugs:
+      - desktop
