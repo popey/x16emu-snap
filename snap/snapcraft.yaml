@@ -35,7 +35,7 @@ parts:
       fi
     override-build: |
       make
-      install rom.bin $SNAPCRAFT_PART_INSTALL/
+      install build/x16/rom.bin $SNAPCRAFT_PART_INSTALL/
   x16-emulator:
     after: [x16-roms]
     plugin: make
@@ -101,7 +101,7 @@ apps:
       - joystick
       - x11
       - opengl
-      - pulseaudio
+      - audio-playback
       - network
       - network-bind
       - home
