@@ -4,7 +4,7 @@ adopt-info: x16-emulator
 summary: Commander X16 Emulator
 description: |
   This is an emulator for the Commander X16 computer system. 
-
+compression: lzo
 grade: stable
 confinement: strict
 
