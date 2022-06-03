@@ -128,6 +128,7 @@ apps:
     command: x16emu -rom $SNAP/rom.bin
     environment:
       LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      ALWAYS_USE_PULSEAUDIO: '1'
     plugs:
       - joystick
       - x11
