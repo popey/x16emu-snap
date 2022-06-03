@@ -49,7 +49,7 @@ parts:
   x16-roms:
     plugin: make
     source: https://github.com/commanderx16/x16-rom.git
-    stage-packages:
+    build-packages:
       - cc65
     override-pull: |
       snapcraftctl pull
