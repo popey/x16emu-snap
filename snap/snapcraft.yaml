@@ -48,7 +48,7 @@ parts:
       - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
   x16-roms:
     plugin: make
-    source: https://github.com/commanderx16/x16-rom.git
+    source: https://github.com/x16community/x16-rom.git
     build-packages:
       - cc65
     override-pull: |
@@ -69,7 +69,7 @@ parts:
   x16-emulator:
     after: [x16-roms,alsa-mixin]
     plugin: make
-    source: https://github.com/commanderx16/x16-emulator.git
+    source: https://github.com/x16community/x16-emulator.git
     build-packages:
       - libsdl2-dev
       - git
