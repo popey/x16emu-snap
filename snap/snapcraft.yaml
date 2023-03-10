@@ -64,7 +64,7 @@ parts:
         git checkout "${last_committed_tag}"
       fi
     override-build: |
-      make
+      PRERELEASE_VERSION=$(echo ${last_committed_tag} | grep -oP '[0-9]+$') make
       install build/x16/rom.bin $SNAPCRAFT_PART_INSTALL/
   x16-emulator:
     after: [x16-roms,alsa-mixin]
