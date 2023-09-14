@@ -8,44 +8,35 @@ compression: lzo
 grade: stable
 confinement: strict
 
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+  - build-on: armhf
+
 layout:
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
-  /usr/share/alsa:
-    bind: $SNAP/usr/share/alsa
 
 parts:
-  alsa-mixin:
+  alsa-pulseaudio:
     plugin: dump
-    source: https://github.com/diddlesnaps/snapcraft-alsa.git
-    source-subdir: snapcraft-assets
-    build-packages:
-      - libasound2-dev
-    stage-packages:
-      - libasound2
-      - libasound2-plugins
-      - yad
-    stage:
-      # restrict to only audio-related files - you need to ensure
-      # that gtk3 is staged for yad to work correctly, to prompt
-      # users to connect the alsa plug or proceed with pulseaudio.
-      #
-      # This helps prevent symbol conflicts in situations where
-      # you're using a non-default library, such as those that the
-      # gnome-3-34 extension for core18 provides.
-      - etc/asound.conf
-      - snap/command-chain/alsa-launch
-      - usr/bin/yad*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libasound*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libdnsfile*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libFLAC*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libjack*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libpulse*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libsamplerate*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libspeex*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvorbis*
-      - usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio
+    source: .
+    override-pull: |
+      mkdir etc -p
+      cat > etc/asound.conf <<EOF
+      pcm.!default {
+          type pulse
+          fallback "sysdefault"
+          hint {
+              show on
+              description "Default ALSA Output (currently PulseAudio Sound Server)"
+          }
+      }
+      ctl.!default {
+          type pulse
+          fallback "sysdefault"
+      }
+      EOF
   x16-roms:
     plugin: make
     source: https://github.com/x16community/x16-rom.git
@@ -67,7 +58,7 @@ parts:
       make
       install build/x16/rom.bin $SNAPCRAFT_PART_INSTALL/
   x16-emulator:
-    after: [x16-roms,alsa-mixin]
+    after: [x16-roms,alsa-pulseaudio]
     plugin: make
     source: https://github.com/x16community/x16-emulator.git
     build-packages:
@@ -95,6 +86,7 @@ parts:
       cp x16emu $SNAPCRAFT_PART_INSTALL
     stage-packages:
       - libasound2
+      - libasound2-plugins
       - libasyncns0
       - libflac8
       - libogg0
@@ -124,11 +116,11 @@ parts:
 
 apps:
   x16emu:
-    command-chain: ["snap/command-chain/alsa-launch"]
+    extensions: [ gnome-3-38 ]
     command: x16emu -rom $SNAP/rom.bin
     environment:
       LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
-      ALWAYS_USE_PULSEAUDIO: '1'
+      ALSA_CONFIG_PATH: "$SNAP/etc/asound.conf"
     plugs:
       - joystick
       - x11
