@@ -1,7 +1,10 @@
 
 ## Snap of the Emulator for the Commander X16 8-bit computer
 
-[![Snap Status](https://build.snapcraft.io/badge/popey/x16emu-snap.svg)](https://build.snapcraft.io/user/popey/x16emu-snap) [![Commander X16 Emulator](https://snapcraft.io/x16emu/badge.svg)](https://snapcraft.io/x16emu)
+[![x16emu](https://snapcraft.io/x16emu/badge.svg)](https://snapcraft.io/x16emu)
+[![x16emu](https://snapcraft.io/x16emu/trending.svg?name=0)](https://snapcraft.io/x16emu)
+
+![Alt](https://repobeats.axiom.co/api/embed/7b0554a87a4e6433609ffe1fdde7f6a85b598f2f.svg "Repobeats analytics image")
 
 This repo contains the build recipe to compile [x16-emulator](https://github.com/commanderx16/x16-emulator) and [x16-roms](https://github.com/commanderx16/x16-rom.git). It uses [cc65](https://github.com/cc65/cc65) to build the x16-rom bundle.
 
