@@ -1,5 +1,5 @@
 name: x16emu
-base: core20
+base: core22
 adopt-info: x16-emulator
 summary: Commander X16 Emulator
 description: |
@@ -14,8 +14,8 @@ architectures:
   - build-on: armhf
 
 layout:
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/alsa-lib
+  /usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib:
+    bind: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/alsa-lib
 
 parts:
   alsa-pulseaudio:
@@ -43,7 +43,7 @@ parts:
     build-packages:
       - cc65
     override-pull: |
-      snapcraftctl pull
+      craftctl default
       last_committed_tag="$(git describe --tags --abbrev=0)"
       echo $last_committed_tag
       last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
@@ -56,7 +56,7 @@ parts:
       fi
     override-build: |
       make
-      install build/x16/rom.bin $SNAPCRAFT_PART_INSTALL/
+      install build/x16/rom.bin $CRAFT_PART_INSTALL/
   x16-emulator:
     after: [x16-roms,alsa-pulseaudio]
     plugin: make
@@ -65,7 +65,7 @@ parts:
       - libsdl2-dev
       - git
     override-pull: |
-      snapcraftctl pull
+      craftctl default
       last_committed_tag="$(git describe --tags --abbrev=0)"
       echo $last_committed_tag
       last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
@@ -76,55 +76,33 @@ parts:
         git fetch
         git checkout "${last_committed_tag}"
         echo "Setting version to $last_committed_tag"
-        snapcraftctl set-version "${last_committed_tag}"
+        craftctl set version="${last_committed_tag}"
       else
         echo "Setting version to $(git rev-parse --short HEAD)"
-        snapcraftctl set-version "$(git rev-parse --short HEAD)"
+        craftctl set version="$(git rev-parse --short HEAD)"
       fi
     override-build: |
-      make
-      cp x16emu $SNAPCRAFT_PART_INSTALL
+      PATH=/usr/bin:$PATH make
+      cp x16emu $CRAFT_PART_INSTALL
     stage-packages:
-      - libasound2
-      - libasound2-plugins
-      - libasyncns0
-      - libflac8
-      - libogg0
-      - libpulse0
+      - libdecor-0-0
       - libsdl2-2.0-0
-      - libsndfile1
-      - libsndio7.0
-      - libvorbis0a
-      - libvorbisenc2
-      - libwayland-client0
-      - libwayland-cursor0
-      - libwayland-egl1
-      - libx11-6
-      - libxau6
-      - libxcb1
-      - libxcursor1
-      - libxdmcp6
-      - libxext6
-      - libxfixes3
-      - libxi6
-      - libxinerama1
-      - libxkbcommon0
-      - libxrandr2
-      - libxrender1
       - libxss1
-      - libxxf86vm1
+
+    prime:
+      - usr/lib/*/libdecor*
+      - usr/lib/*/libSDL*
+      - usr/lib/*/libXss*
+      - x16emu
 
 apps:
   x16emu:
-    extensions: [ gnome-3-38 ]
+    extensions: [ gnome ]
     command: x16emu -rom $SNAP/rom.bin
     environment:
-      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       ALSA_CONFIG_PATH: "$SNAP/etc/asound.conf"
     plugs:
       - joystick
-      - x11
-      - opengl
       - audio-playback
       - audio-record
       - alsa
@@ -132,4 +110,3 @@ apps:
       - network-bind
       - home
       - removable-media
-      - wayland
