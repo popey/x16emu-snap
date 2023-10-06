@@ -1,12 +1,19 @@
-name: "build"
-on: # run on pull requests and commits to master
+name: build-test
+on:
   pull_request:
   push:
     branches:
-    - master
+      - edge
+      - stable
+
 jobs:
-  build:
+  snap:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: jhenstridge/snapcraft-build-action@v1
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - uses: actions/upload-artifact@v2
+      with:
+        name: 'snap'
+        path: ${{ steps.snapcraft.outputs.snap}}
