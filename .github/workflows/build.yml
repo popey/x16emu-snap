@@ -1,0 +1,12 @@
+name: "build"
+on: # run on pull requests and commits to master
+  pull_request:
+  push:
+    branches:
+    - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: jhenstridge/snapcraft-build-action@v1
