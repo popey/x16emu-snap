@@ -70,8 +70,6 @@ parts:
       echo $last_committed_tag
       last_released_tag="$(snap info $SNAPCRAFT_PROJECT_NAME | awk '$1 == "latest/beta:" { print $2 }')"
       echo $last_released_tag
-      # If the latest tag from the upstream project has not been released to
-      # beta, build that tag instead of master.
       if [ "${last_committed_tag}" != "${last_released_tag}" ]; then
         git fetch
         git checkout "${last_committed_tag}"
