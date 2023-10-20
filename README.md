@@ -1,6 +1,7 @@
 
 ## Snap of the Emulator for the Commander X16 8-bit computer
 
+[![x16emu](https://github.com/popey/x16emu-snap/actions/workflows/build.yml/badge.svg)](https://github.com/popey/x16emu-snap/actions)
 [![x16emu](https://snapcraft.io/x16emu/badge.svg)](https://snapcraft.io/x16emu)
 [![x16emu](https://snapcraft.io/x16emu/trending.svg?name=0)](https://snapcraft.io/x16emu)
 
