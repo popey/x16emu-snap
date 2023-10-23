@@ -37,12 +37,24 @@ parts:
           fallback "sysdefault"
       }
       EOF
+  lzsa:
+    plugin: make
+    source: https://github.com/emmanuel-marty/lzsa.git
+    source-tag: 1.4.1
+    build-packages:
+      - clang
+    override-build: |
+      make
+      mkdir $CRAFT_PART_INSTALL/bin
+      cp ./lzsa $CRAFT_PART_INSTALL/bin
   x16-roms:
+    after: [lzsa]
     plugin: make
     source: https://github.com/x16community/x16-rom.git
     build-packages:
       - cc65
     override-pull: |
+      export PATH=$PATH:$CRAFT_STAGE/bin
       craftctl default
       last_committed_tag="$(git describe --tags --abbrev=0)"
       echo $last_committed_tag
